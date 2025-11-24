@@ -7,53 +7,48 @@ from model import GarchModel
 from pydantic import BaseModel
 
 
-#`FitIn` class
+# `FitIn` class
 
-#The FitIn class should inherit from the pydantic BaseClass, and the FitOut class should inherit from the FitIn class.
+# The FitIn class should inherit from the pydantic BaseClass, and the FitOut class should inherit from the FitIn class.
 # data class we are using when checking data when sending request to serve
 class FitIn(BaseModel):
-    ticker:str
-    use_new_data:bool
-    n_observations:int
-    p:int
-    q:int
-    
+    ticker: str
+    use_new_data: bool
+    n_observations: int
+    p: int
+    q: int
 
 
 # data class we are using when checking data from the server back to the client
-#FitOut` class
+# `FitOut` class
 class FitOut(FitIn):
-    success:bool
-    message:str
-
-
+    success: bool
+    message: str
 
 
 # `PredictIn` class
 class PredictIn(BaseModel):
-    ticker:str
-    n_days:int
-
+    ticker: str
+    n_days: int
 
 
 # `PredictOut` class
 class PredictOut(PredictIn):
-    success:bool
-    forecast:dict
-    message:str
-
+    success: bool
+    forecast: dict
+    message: str
 
 
 #
-def build_model(ticker,use_new_data):
+def build_model(ticker, use_new_data):
     # Create DB connection
-    connection =sqlite3.connect(settings.db_name,check_same_thread=False)
+    connection = sqlite3.connect(settings.db_name, check_same_thread=False)
 
     # Create `SQLRepository`
     repo = SQLRepository(connection=connection)
 
     # Create model
-    model = GarchModel(ticker=ticker,use_new_data=use_new_data,repo=repo)
+    model = GarchModel(ticker=ticker, use_new_data=use_new_data, repo=repo)
 
     # Return model
     return model
@@ -63,20 +58,18 @@ def build_model(ticker,use_new_data):
 app = FastAPI()
 
 
-
 # `"/hello" path with 200 status code
-@app.get("/hello",status_code=200)
-
+@app.get("/hello", status_code=200)
 def hello():
     """Return dictionary with greeting message."""
-    return {"message":"Hello world1!"} 
+    return {"message": "Hello world1!"}
+
 
 # Building actual path we need for this application ("/fit path")
 # first path will allow the user to fit a model to stock data when they make a post request to our server.
 # `"/fit" path, 200 status code
-@app.post("/fit",status_code=200,response_model=FitOut)
-
-def fit_model(request:FitIn):
+@app.post("/fit", status_code=200, response_model=FitOut)
+def fit_model(request: FitIn):
     """Fit model, return confirmation message.
 
     Parameters
@@ -89,35 +82,30 @@ def fit_model(request:FitIn):
         Must conform to `FitOut` class
     """
     # Create `response` dictionary from `request`
-    response=request.dict()
-
+    response = request.dict()
 
     # Create try block to handle exceptions
     try:
-
         # Build model with `build_model` function
-        model=build_model(ticker=request.ticker,use_new_data=request.use_new_data)
-        
+        model = build_model(ticker=request.ticker, use_new_data=request.use_new_data)
 
         # Wrangle data
         model.wrangle_data(n_observations=request.n_observations)
-       
 
         # Fit model
-        model.fit(p=request.p,q=request.q)
-        
+        model.fit(p=request.p, q=request.q)
 
         # Save model
-        filename=model.dump()
-         #  Extract AIC and BIC
+        filename = model.dump()
+
+        # Extract AIC and BIC
         aic = getattr(model, "aic", None)
         bic = getattr(model, "bic", None)
 
         # Add `"success"` key to `response`
-
         response["success"] = True
 
-         # Add `"message"` key to `response` with `filename,AIC nad BIC`
+        # Add `"message"` key to `response` with `filename, AIC and BIC`
         response["message"] = (
             f"Trained and saved '{filename}'. "
             f"Metrics: AIC {aic}, BIC {bic}."
@@ -125,75 +113,62 @@ def fit_model(request:FitIn):
 
     # Create except block
     except Exception as e:
-
         # Add `"success"` key to `response`
-        response["success"]=False
-      
+        response["success"] = False
 
         # Add `"message"` key to `response` with error message
-        response["message"]=str(e)
-       
+        response["message"] = str(e)
 
     # Return response
-
     return response
-#Build the predict path
 
-#`"/predict" path, 200 status code
-@app.post("/predict",status_code=200,response_model=PredictOut)
 
-def get_prediction(request:PredictIn):
+# Build the predict path
+
+# `"/predict" path, 200 status code
+@app.post("/predict", status_code=200, response_model=PredictOut)
+def get_prediction(request: PredictIn):
     # Create `response` dictionary from `request`
-    response=request.dict()
-
+    response = request.dict()
 
     # Create try block to handle exceptions
     try:
-
         # Build model with `build_model` function
-        model=build_model(ticker=request.ticker,use_new_data=False)
+        model = build_model(ticker=request.ticker, use_new_data=False)
 
         # Load stored model
         model.load()
-     
 
         # Generate prediction
-        prediction=model.predict_volatility(horizon=request.n_days)
-
+        prediction = model.predict_volatility(horizon=request.n_days)
 
         # Add `"success"` key to `response`
-        response["success"]=True
-       
+        response["success"] = True
 
         # Add `"forecast"` key to `response`
-        response["forecast"]=prediction
-       
+        response["forecast"] = prediction
 
-        # Add `"message"` key to `response
-        response["message"]=""
-      
-#if the arguments in the code above don't work
+        # Add `"message"` key to `response`
+        response["message"] = ""
+
     # Create except block
     except Exception as e:
-    
         # Add `"success"` key to `response`
-        response["success"]=False
-        
+        response["success"] = False
 
         # Add `"forecast"` key to `response`
-        response["forecast"]={}
+        response["forecast"] = {}
 
-
-        #  Add `"message"` key to `response`
-        response["message"]=str(e)
-  
+        # Add `"message"` key to `response`
+        response["message"] = str(e)
 
     # Return response
     return response
+
+
 if __name__ == "__main__":
-import os
-import uvicorn
+    import os
+    import uvicorn
 
-port = int(os.environ.get("PORT", 8000))  # Use PORT from environment if available
-uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
-
+    port = int(os.environ.get("PORT", 8000))  # Use PORT from environment if available
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
