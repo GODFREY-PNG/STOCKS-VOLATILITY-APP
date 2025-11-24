@@ -43,33 +43,40 @@ class GarchModel:
         self.model_directory = settings.model_directory
     
     def wrangle_data(self, n_observations):
-        """Extract data from database (or get from AlphaVantage), transform it
+        """
+        Extract data from database (or get from AlphaVantage), transform it
         for training model, and attach it to `self.data`.
         
         Parameters
         ----------
         n_observations : int
-            Number of observations to retrieve from database
-        
+            Number of observations to retrieve from database.  
+            **Step:** We now ensure that n_observations cannot exceed the
+            number of rows in the database to avoid errors.
+
         Returns
         -------
         None
         """
-        # Add new data to database if required(this code is for load new data if specified by the user)
+        # Fetch new data from AlphaVantage if user wants new data
         if self.use_new_data:
-            # Instantiate an API class
             api = AlphaVantageAPI()
-            # Get data
             new_data = api.get_daily(ticker=self.ticker)
-            # Insert data into repo
             self.repo.insert_table(
                 table_name=self.ticker, records=new_data, if_exists="replace"
             )
         
-        # Pull data from SQL database
-        df = self.repo.read_table(table_name=self.ticker, limit=n_observations + 1)
-        # Clean data by creating return column and droping NAN, attach to class as `data` attribute
+        # pull data from SQL database
+        df = self.repo.read_table(table_name=self.ticker)
+
+        #  Adjust n_observations to not exceed available data
+        if n_observations > len(df) - 1:
+            n_observations = len(df) - 1  # ensure we don't go out of bounds
+
+        df = df.tail(n_observations + 1)  # get the last n_observations + 1
         df.sort_index(ascending=True, inplace=True)
+
+        # Calculate returns and drop NaN
         df["return"] = df["close"].pct_change() * 100
         self.data = df["return"].dropna()
     
