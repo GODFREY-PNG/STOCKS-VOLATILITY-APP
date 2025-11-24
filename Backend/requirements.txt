@@ -1,3 +1,4 @@
+pydantic-settings
 fastapi==0.121.3
 pydantic>=2.0.0
 numpy>=1.26.0
