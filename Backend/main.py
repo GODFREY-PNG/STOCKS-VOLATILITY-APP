@@ -1,3 +1,4 @@
+import os
 import sqlite3
 
 from config import settings
@@ -6,6 +7,10 @@ from fastapi import FastAPI
 from model import GarchModel
 from pydantic import BaseModel
 
+# Environment variables
+ALPHA_API_KEY = os.getenv("ALPHA_API_KEY")  # for fetching stock data
+MODEL_DIRECTORY = os.getenv("MODEL_DIRECTORY", "./models")  # default local path if not set
+DB_NAME = os.getenv("DB_NAME", "stocks.db")  # default local database if not set
 
 # `FitIn` class
 
