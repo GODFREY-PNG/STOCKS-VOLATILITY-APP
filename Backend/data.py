@@ -52,6 +52,7 @@ class AlphaVantageAPI:
 
         # Check if valid time series exists
         if "Time Series (Daily)" in response_data:
+            
             stock_data = response_data["Time Series (Daily)"]
             # Read data into DataFrame
             df = pd.DataFrame.from_dict(stock_data, orient="index", dtype=float)

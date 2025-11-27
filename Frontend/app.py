@@ -2,10 +2,22 @@ import streamlit as st
 import requests
 import pandas as pd
 
-API_URL = "http://127.0.0.1:8000"  # your local FastAPI URL
+# ------------------------------------------
+# Backend URL
+# ------------------------------------------
+API_URL =  "http://localhost:8000"
 
-st.title("GARCH Model App")
+# -------------------------
+# Streamlit App Layout
+# -------------------------
+st.set_page_config(page_title="GARCH Volatility App", layout="wide")
 
+# Header
+st.title("GARCH Volatility Model App")
+st.markdown("**Designed by:** Data Scientist **Adembesa Godfrey**")
+st.markdown("**Tested with backtesting techniques**")
+
+# Sidebar page selector
 page = st.sidebar.selectbox("Pages", ["Fit Model", "Predict Volatility"])
 
 # -------------------------
@@ -14,6 +26,7 @@ page = st.sidebar.selectbox("Pages", ["Fit Model", "Predict Volatility"])
 if page == "Fit Model":
     st.header("Fit a GARCH Model")
 
+    # User input for model parameters
     ticker = st.text_input("Ticker:", "AAPL")
     use_new_data = st.checkbox("Use new data", value=True)
     n_observations = st.number_input("Number of observations", 50, 5000, 300)
@@ -33,41 +46,18 @@ if page == "Fit Model":
             response = requests.post(f"{API_URL}/fit", json=payload).json()
             if response["success"]:
                 st.success(response["message"])
-
-                # -------------------------
-                # Display historical data plot
-                # -------------------------
-                # Request historical data from FastAPI backend
-                data_response = requests.get(f"{API_URL}/hello").json()  # placeholder if you have endpoint to fetch data
-                # For now we fetch directly from AlphaVantage API if endpoint exists
-                # If backend exposes a /data endpoint, replace this with actual endpoint
-
-                # Example: simulate fetching last n_observations of close prices
-                # This assumes your backend stores data in SQLite and you can fetch it
-                try:
-                    import sqlite3
-                    from config import settings
-                    from data import SQLRepository
-
-                    conn = sqlite3.connect(settings.db_name, check_same_thread=False)
-                    repo = SQLRepository(conn)
-                    df = repo.read_table(ticker, limit=n_observations)
-                    st.subheader("Historical Close Prices")
-                    st.line_chart(df["close"])
-                except Exception as e:
-                    st.warning(f"Could not load historical prices for plot: {e}")
-
             else:
                 st.error(response["message"])
         except Exception as e:
-            st.error(f"Error connecting to API: {e}")
+            st.error(f"Error connecting to backend: {e}")
 
 # -------------------------
-# PREDICT PAGE
+# PREDICT VOLATILITY PAGE
 # -------------------------
 else:
     st.header("Predict Volatility")
 
+    # User input for prediction
     ticker = st.text_input("Ticker:", "AAPL")
     n_days = st.number_input("Days to forecast:", 1, 365, 5)
 
@@ -78,7 +68,7 @@ else:
             response = requests.post(f"{API_URL}/predict", json=payload).json()
             if response["success"]:
                 st.success("Forecast:")
-                
+
                 # Convert forecast dict to DataFrame for plotting
                 forecast_dict = response["forecast"]
                 forecast_df = pd.DataFrame(list(forecast_dict.items()), columns=["Date", "Volatility"])
@@ -94,4 +84,10 @@ else:
             else:
                 st.error(response["message"])
         except Exception as e:
-            st.error(f"Error connecting to API: {e}")
+            st.error(f"Error connecting to backend: {e}")
+
+# -------------------------
+# Footer
+# -------------------------
+st.markdown("---")
+st.markdown("**Contact:** godfreyimbindi@gmail.com")

@@ -37,7 +37,9 @@ class GarchModel:
     """
     
     def __init__(self, ticker, repo, use_new_data):
+    
         self.ticker = ticker
+        self.ticker = self.ticker.strip().upper()
         self.repo = repo
         self.use_new_data = use_new_data
         self.model_directory = settings.model_directory
