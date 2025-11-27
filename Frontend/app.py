@@ -5,7 +5,11 @@ import pandas as pd
 # ------------------------------------------
 # Backend URL
 # ------------------------------------------
-API_URL =  "http://localhost:8000"
+import os
+
+# Use environment variable if set, otherwise default to localhost
+API_URL = os.getenv("API_URL", "http://localhost:8000")
+
 
 # -------------------------
 # Streamlit App Layout
