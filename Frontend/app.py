@@ -9,7 +9,7 @@ import os
 
 # Use environment variable if set, otherwise default to localhost
 API_URL = os.getenv("API_URL", "http://localhost:8000")
-
+st.write("Using backend API URL:", API_URL)
 
 # -------------------------
 # Streamlit App Layout
