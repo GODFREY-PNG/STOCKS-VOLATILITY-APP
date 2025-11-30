@@ -7,7 +7,6 @@ from fastapi import FastAPI
 from model import GarchModel
 from pydantic import BaseModel
 
-print("Alpha API Key:", os.getenv("alpha_api_key"))
 
 
 # Environment variables
