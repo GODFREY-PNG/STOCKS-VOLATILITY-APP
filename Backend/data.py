@@ -48,10 +48,7 @@ class AlphaVantageAPI:
 
         # Send request to API
         response = requests.get(url=url)
-        print("DEBUG URL:", url)
-        print("DEBUG Status code:", response.status_code)
-        print("DEBUG Response snippet:", response.text[:500])  # first 500 chars
-                
+     
         
         # Extract JSON data from response
         response_data = response.json()
