@@ -5,7 +5,7 @@ from config import settings
 from data import SQLRepository
 from fastapi import FastAPI
 from model import GarchModel
-from pydantic import BaseMod
+from pydantic import BaseModel
 
 
 # Environment variables
