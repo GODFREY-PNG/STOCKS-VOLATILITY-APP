@@ -10,9 +10,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Environment variables
-alpha_api_key= os.getenv("alpha_api_key")  # for fetching stock data
-model_directory = os.getenv("model_directory", "./models")  # default local path if not set
-db_name = os.getenv("db_name", "stocks.db")  # default local database if not set
+alpha_api_key= os.getenv("ALPHA_API_KEY")  # for fetching stock data
+model_directory = os.getenv("MODEL_DIRECTORY", "./models")  # default local path if not set
+db_name = os.getenv("DB_NAME", "stocks.db")  # default local database if not set
 
 # `FitIn` class
 
