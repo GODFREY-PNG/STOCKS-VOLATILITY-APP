@@ -2,11 +2,7 @@
 you can use your AplhaVantage API key in other parts of the application.
 """
 
-# The os library allows you to communicate with a computer's
-# operating system: https://docs.python.org/3/library/os.html
 import os
-
-# pydantic used for data validation: https://pydantic-docs.helpmanual.io/
 from pydantic_settings import BaseSettings
 
 
@@ -22,13 +18,15 @@ class Settings(BaseSettings):
     """Uses pydantic to define settings for project."""
 
     alpha_api_key: str
-    db_name: str
-    model_directory: str
+    db_name: str = "stocks.db"  # Add default value
+    model_directory: str = "./models"  # Add default value
 
     class Config:
         env_file = return_full_path(".env")
+        # This allows pydantic to read from environment variables even if .env doesn't exist
+        env_file_encoding = 'utf-8'
+        case_sensitive = False  # This allows ALPHA_API_KEY to match alpha_api_key
 
 
-# Create instance of `Settings` class that will be imported
-# in lesson notebooks and the other modules for application.
+# Create instance of `Settings` class
 settings = Settings()
