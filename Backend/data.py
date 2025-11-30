@@ -10,10 +10,6 @@ import requests
 from config import settings
 import requests
 
-url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AAPL&apikey={alpha_api_key}"
-r = requests.get(url)
-print(r.status_code, r.text)  # see full response
-
 
 
 class AlphaVantageAPI:
@@ -52,6 +48,10 @@ class AlphaVantageAPI:
 
         # Send request to API
         response = requests.get(url=url)
+                
+        url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AAPL&apikey={alpha_api_key}"
+        r = requests.get(url)
+        print(r.status_code, r.text)  # see full response
 
         # Extract JSON data from response
         response_data = response.json()
