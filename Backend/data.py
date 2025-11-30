@@ -48,11 +48,11 @@ class AlphaVantageAPI:
 
         # Send request to API
         response = requests.get(url=url)
+        print("DEBUG URL:", url)
+        print("DEBUG Status code:", response.status_code)
+        print("DEBUG Response snippet:", response.text[:500])  # first 500 chars
                 
-        url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AAPL&apikey={alpha_api_key}"
-        r = requests.get(url)
-        print(r.status_code, r.text)  # see full response
-
+        
         # Extract JSON data from response
         response_data = response.json()
 
