@@ -5,7 +5,9 @@ from config import settings
 from data import SQLRepository
 from fastapi import FastAPI
 from model import GarchModel
-from pydantic import BaseModel
+from pydantic import BaseMod
+from dotenv import load_dotenv
+load_dotenv()
 
 # Environment variables
 alpha_api_key= os.getenv("alpha_api_key")  # for fetching stock data
