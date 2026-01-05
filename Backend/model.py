@@ -43,6 +43,8 @@ class GarchModel:
         self.repo = repo
         self.use_new_data = use_new_data
         self.model_directory = settings.model_directory
+        #Create the directory if it doesn't exist
+        os.makedirs(self.model_directory, exist_ok=True)
     
     def wrangle_data(self, n_observations):
         """
