@@ -13,18 +13,7 @@ from pydantic import BaseModel
 alpha_api_key= os.getenv("ALPHA_API_KEY")  # for fetching stock data
 model_directory = os.getenv("MODEL_DIRECTORY", "./models")  # default local path if not set
 db_name = os.getenv("DB_NAME", "stocks.db")  # default local database if not set
-print("Using database:", db_name)
 
-if not os.path.exists(db_name):
-    print("DB file does not exist, will create new one.")
-
-try:
-    conn = sqlite3.connect(db_name)
-    cursor = conn.cursor()
-    cursor.execute("SELECT name FROM sqlite_master LIMIT 1;")
-    print("Database opened successfully")
-except Exception as e:
-    print("Error opening database:", e)
 
 # `FitIn` class
 
