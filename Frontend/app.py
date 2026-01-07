@@ -41,12 +41,15 @@ body { background-color: #0e1117; }
 # ------------------------------------------
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 st.sidebar.caption(f"API: {API_URL}")
+st.write(f"Using backend API URL: {API_URL}")  # Show for debugging
 
 # ------------------------------------------
 # Sidebar
 # ------------------------------------------
 st.sidebar.markdown("## 📊 GARCH Volatility App")
-page = st.sidebar.radio("Navigation", ["📈 Fit Model", "🔮 Predict Volatility"])
+page = st.sidebar.selectbox("Pages", ["Fit Model", "Predict Volatility"])
+st.sidebar.markdown("---")
+st.sidebar.caption("Powered by FastAPI + ARCH + Streamlit")
 
 # ------------------------------------------
 # Header
@@ -58,21 +61,17 @@ st.markdown("---")
 # ------------------------------------------
 # FIT MODEL
 # ------------------------------------------
-if page == "📈 Fit Model":
+if page == "Fit Model":
     st.markdown('<div class="section-title">Model Training</div>', unsafe_allow_html=True)
     st.markdown('<div class="card">', unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        ticker = st.text_input("Stock Ticker", "AAPL")
-        use_new_data = st.checkbox("Fetch latest market data", value=True)
-        n_observations = st.number_input("Observations", 50, 5000, 300)
+    ticker = st.text_input("Stock Ticker", "AAPL")
+    use_new_data = st.checkbox("Fetch latest market data", value=True)
+    n_observations = st.number_input("Observations", 50, 5000, 300)
+    p = st.number_input("p", 1, 10, 1)
+    q = st.number_input("q", 1, 10, 1)
 
-    with col2:
-        p = st.number_input("p", 1, 10, 1)
-        q = st.number_input("q", 1, 10, 1)
-
-    if st.button("🚀 Train Model", use_container_width=True):
+    if st.button("🚀 Train Model"):
         payload = dict(
             ticker=ticker,
             use_new_data=use_new_data,
@@ -83,14 +82,13 @@ if page == "📈 Fit Model":
 
         try:
             response = requests.post(f"{API_URL}/fit", json=payload)
-
-            if response.headers.get("content-type", "").startswith("application/json"):
+            try:
                 data = response.json()
                 if data.get("success"):
                     st.success(data["message"])
                 else:
-                    st.error(data.get("message"))
-            else:
+                    st.error(data.get("message", "Unknown error"))
+            except:
                 st.error("Backend returned non-JSON response")
                 st.text(response.text)
 
@@ -109,27 +107,22 @@ else:
     ticker = st.text_input("Stock Ticker", "AAPL")
     n_days = st.number_input("Forecast Days", 1, 365, 5)
 
-    if st.button("📊 Generate Forecast", use_container_width=True):
+    if st.button("📊 Generate Forecast"):
         try:
-            response = requests.post(
-                f"{API_URL}/predict",
-                json={"ticker": ticker, "n_days": n_days}
-            )
-
-            if response.headers.get("content-type", "").startswith("application/json"):
+            response = requests.post(f"{API_URL}/predict", json={"ticker": ticker, "n_days": n_days})
+            try:
                 data = response.json()
                 if data.get("success"):
-                    df = pd.DataFrame(
-                        data["forecast"].items(),
-                        columns=["Date", "Volatility"]
-                    )
+                    df = pd.DataFrame(data["forecast"].items(), columns=["Date", "Volatility"])
                     df["Date"] = pd.to_datetime(df["Date"])
                     df.set_index("Date", inplace=True)
+                    st.subheader("Predicted Volatility")
                     st.dataframe(df)
+                    st.subheader("Forecast Chart")
                     st.line_chart(df["Volatility"])
                 else:
-                    st.error(data.get("message"))
-            else:
+                    st.error(data.get("message", "Unknown error"))
+            except:
                 st.error("Backend returned non-JSON response")
                 st.text(response.text)
 
@@ -142,7 +135,4 @@ else:
 # Footer
 # ------------------------------------------
 st.markdown("---")
-st.markdown(
-    '<div class="footer">© 2026 | Adembesa Godfrey</div>',
-    unsafe_allow_html=True
-)
+st.markdown('<div class="footer">© 2026 | Adembesa Godfrey</div>', unsafe_allow_html=True)
