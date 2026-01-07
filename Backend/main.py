@@ -7,7 +7,29 @@ from fastapi import FastAPI
 from model import GarchModel
 from pydantic import BaseModel
 
-print("Database being used:", settings.db_name)
+import os
+import sqlite3
+
+db_path = settings.db_name
+
+# Check if database file exists
+if not os.path.exists(db_path):
+    print(f"Database '{db_path}' not found. Creating a new one...")
+    conn = sqlite3.connect(db_path)
+    conn.close()
+
+# Check if database is valid
+try:
+    conn = sqlite3.connect(db_path)
+    conn.execute("SELECT name FROM sqlite_master LIMIT 1;")
+    conn.close()
+except sqlite3.DatabaseError:
+    print(f"Database '{db_path}' is corrupted. Recreating it...")
+    os.remove(db_path)  # remove corrupted file
+    conn = sqlite3.connect(db_path)
+    conn.close()
+
+print(f"Using database: {db_path}")
 
 # Environment variables
 alpha_api_key= os.getenv("ALPHA_API_KEY")  # for fetching stock data
