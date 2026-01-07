@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from model import GarchModel
 from pydantic import BaseModel
 
-
+print("Database being used:", settings.db_name)
 
 # Environment variables
 alpha_api_key= os.getenv("ALPHA_API_KEY")  # for fetching stock data
