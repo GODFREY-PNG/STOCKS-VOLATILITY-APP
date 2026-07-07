@@ -6,17 +6,19 @@ A financial risk forecasting application that predicts stock price volatility us
 
 ## What It Does
 
-Stock markets are uncertain. Before making investment decisions, traders and analysts need to understand how volatile — how "risky" — a stock is likely to be in the coming days.
+Stock markets are inherently uncertain. Understanding how volatile — how "risky" — a stock is likely to be over the coming days helps in reasoning about that uncertainty more rigorously.
 
-This platform solves that problem by:
+This platform does that by:
 
 - Fetching real historical stock price data from the Alpha Vantage API
-- Training a GARCH statistical model that learns how volatility clusters over time
-- Generating volatility forecasts for 1 to 30 business days ahead
-- Assigning a risk level (Low / Moderate / High) to each forecast
-- Allowing side-by-side comparison of two stocks
+- Training a GARCH statistical model that captures how volatility clusters over time
+- Generating volatility forecasts for 1–30 business days ahead
+- Assigning an interpretable risk level (Low / Moderate / High) to each forecast
+- Comparing two stocks side-by-side
 
-It is built for finance students, data scientists, quant researchers, and anyone who wants to understand stock risk without relying on black-box tools.
+Built for finance students, data scientists, and quant researchers who want a transparent, explainable alternative to black-box forecasting tools.
+
+*This tool is for research and educational purposes only. Forecasts are statistical estimates based on historical data, not investment advice or a guarantee of future performance.*
 
 ---
 
@@ -220,12 +222,11 @@ The model predicts **conditional volatility** — not whether the price goes up 
 
 ## Risk Classification
 
-| Level    | Volatility Range | Interpretation                                      |
-|----------|-----------------|-----------------------------------------------------|
-| 🟢 Low   | < 1.5% per day  | Stable period. Suitable for conservative positions. |
-| 🟡 Moderate | 1.5–2.5%  | Normal market conditions.                           |
-| 🔴 High  | > 2.5% per day  | Elevated risk. Consider hedging or reduced exposure.|
-
+| Level    | Volatility Range | Statistical Interpretation                              |
+|----------|-------------------|-----------------------------------------------------------|
+| 🟢 Low   | < 1.5% per day    | Model estimates below-average expected daily price movement. |
+| 🟡 Moderate | 1.5–2.5%       | Model estimates typical historical price movement for this stock. |
+| 🔴 High  | > 2.5% per day    | Model estimates above-average expected daily price movement. |
 ---
 
 ## Future Improvements
